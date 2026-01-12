@@ -1,12 +1,11 @@
 import streamlit as st
-import streamlit.components.v1 as components
 
 def render_custom_header():
     """
     Renderiza o cabeçalho fixo customizado no topo da página.
 
     Layout:
-    1. Botões de navegação (Abas funcionais via query params)
+    1. Botões de navegação (usando botões Streamlit nativos)
     2. Cards de resumo (Filtros atuais)
     3. Expander para detalhes de municípios (quando necessário)
     """
@@ -65,9 +64,9 @@ def render_custom_header():
         .header-nav-row {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: flex-start;
             padding: 1rem 2rem;
-            gap: 2rem;
+            gap: 0.75rem;
             border-bottom: 1px solid rgba(0,0,0,0.06);
             flex-wrap: nowrap;
             background: white;
@@ -84,56 +83,56 @@ def render_custom_header():
             min-height: 90px;
         }
 
-        /* BOTÕES DE NAVEGAÇÃO */
-        .nav-links-container {
-            display: flex;
+        /* CONTAINER DOS BOTÕES STREAMLIT */
+        #header-tabs-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            background: white;
+            z-index: 999999;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            padding: 1rem 2rem;
+            display: flex !important;
             gap: 0.75rem;
             align-items: center;
-            flex-wrap: nowrap;
-            flex-grow: 1;
+            min-height: 70px;
         }
 
-        .nav-link {
-            text-decoration: none !important;
+        /* Estiliza os botões Streamlit dentro do container */
+        #header-tabs-container button[data-testid="baseButton-secondary"] {
             color: #666 !important;
             font-weight: 500;
-            padding: 0.6rem 1.2rem;
-            border-radius: 8px;
+            padding: 0.6rem 1.2rem !important;
+            border-radius: 8px !important;
             transition: all 0.25s ease;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            font-size: 13px;
+            font-size: 13px !important;
             white-space: nowrap;
-            border: 1px solid #e0e0e0;
-            background: white;
+            border: 1px solid #e0e0e0 !important;
+            background: white !important;
             cursor: pointer;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            flex-shrink: 0;
-            height: 40px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+            height: 40px !important;
             min-width: fit-content;
         }
 
-        .nav-link:hover {
+        #header-tabs-container button[data-testid="baseButton-secondary"]:hover {
             color: #8e24aa !important;
-            background: #f9f5ff;
-            border-color: #dfc8e8;
-            box-shadow: 0 2px 6px rgba(142, 36, 170, 0.15);
+            background: #f9f5ff !important;
+            border-color: #dfc8e8 !important;
+            box-shadow: 0 2px 6px rgba(142, 36, 170, 0.15) !important;
             transform: translateY(-1px);
         }
 
-        .nav-link.active {
+        /* Botão ativo (marcado quando está selecionado) */
+        #header-tabs-container button[data-testid="baseButton-secondary"][kind="primary"],
+        #header-tabs-container button[data-testid="baseButton-secondary"].active {
             background: linear-gradient(135deg, #8e24aa 0%, #ab47bc 100%) !important;
             color: white !important;
-            font-weight: 700;
-            box-shadow: 0 4px 12px rgba(142, 36, 170, 0.35);
-            border-color: #8e24aa;
-        }
-
-        .nav-link.active:hover {
-            box-shadow: 0 6px 16px rgba(142, 36, 170, 0.4);
-            transform: translateY(-2px);
+            font-weight: 700 !important;
+            box-shadow: 0 4px 12px rgba(142, 36, 170, 0.35) !important;
+            border-color: #8e24aa !important;
         }
 
         /* CARDS DE INFO */
@@ -272,16 +271,16 @@ def render_custom_header():
 
         /* RESPONSIVIDADE */
         @media (max-width: 1200px) {
-            .header-nav-row {
+            #header-tabs-container {
                 padding: 0.75rem 1.5rem;
-                gap: 1rem;
+                gap: 0.5rem;
                 min-height: 65px;
             }
 
-            .nav-link {
-                padding: 0.5rem 1rem;
-                font-size: 12px;
-                height: 36px;
+            #header-tabs-container button[data-testid="baseButton-secondary"] {
+                padding: 0.5rem 1rem !important;
+                font-size: 12px !important;
+                height: 36px !important;
             }
 
             .header-info-row {
@@ -304,24 +303,16 @@ def render_custom_header():
         }
 
         @media (max-width: 900px) {
-            .fixed-header {
-                width: 100%;
-            }
-
-            .header-nav-row {
+            #header-tabs-container {
                 padding: 0.75rem 1rem;
-                gap: 0.5rem;
+                gap: 0.3rem;
                 min-height: 60px;
             }
 
-            .nav-link {
-                padding: 0.4rem 0.8rem;
-                font-size: 11px;
-                height: 34px;
-            }
-
-            .nav-link span {
-                display: none;
+            #header-tabs-container button[data-testid="baseButton-secondary"] {
+                padding: 0.4rem 0.8rem !important;
+                font-size: 11px !important;
+                height: 34px !important;
             }
 
             .info-container {
@@ -348,16 +339,16 @@ def render_custom_header():
         }
 
         @media (max-width: 600px) {
-            .header-nav-row {
+            #header-tabs-container {
                 padding: 0.5rem;
-                gap: 0.3rem;
+                gap: 0.2rem;
                 min-height: 55px;
             }
 
-            .nav-link {
-                padding: 0.3rem 0.5rem;
-                font-size: 10px;
-                height: 32px;
+            #header-tabs-container button[data-testid="baseButton-secondary"] {
+                padding: 0.3rem 0.5rem !important;
+                font-size: 10px !important;
+                height: 32px !important;
             }
 
             .header-info-row {
@@ -371,31 +362,10 @@ def render_custom_header():
     </style>
     """
 
-    # --- CONSTRUÇÃO DO HTML ---
-    def get_active_tab():
-        """Retorna a aba ativa ou padrão"""
-        return st.session_state.get('active_tab', 'Análise Geral')
+    # --- INJETAR CSS ---
+    st.markdown(header_style, unsafe_allow_html=True)
 
-    def build_nav_html():
-        """Constrói os botões de navegação usando botões com onclick JavaScript"""
-        active = get_active_tab()
-
-        # Mapeamento de abas para query params
-        nav_items = [
-            {"key": "Análise Geral", "label": "Análise Geral", "icon": "📊", "param": "analise-geral"},
-            {"key": "Análise de Feminicídios", "label": "Análise de Feminicídios", "icon": "🚨", "param": "feminicidios"},
-            {"key": "Metodologia e Glossário", "label": "Metodologia e Glossário", "icon": "📖", "param": "metodologia"},
-            {"key": "Download de Dados", "label": "Download de Dados", "icon": "📥", "param": "download"},
-        ]
-
-        nav_html = '<div class="nav-links-container">'
-        for item in nav_items:
-            active_class = "active" if item["key"] == active else ""
-            # Criar botão com onclick que muda a URL
-            nav_html += f'<button class="nav-link {active_class}" onclick="navegarAba(\'{item["param"]}\')"><span>{item["icon"]}</span> {item["label"]}</button>'
-        nav_html += '</div>'
-        return nav_html
-
+    # --- CONSTRUIR INFO CARDS HTML ---
     def build_info_html():
         """Constrói os cards de informação dos filtros"""
         if 'data_inicial' not in st.session_state or 'df_geral_filtrado' not in st.session_state:
@@ -441,36 +411,70 @@ def render_custom_header():
         info_html = f'<div class="header-info-row"><div class="info-container"><div class="info-card"><h5>📅 Período</h5><p>{data_ini.strftime("%d/%m/%Y")} - {data_fim.strftime("%d/%m/%Y")}</p><span>{dias_totais} dias</span></div><div class="info-card"><h5>🗺️ Abrangência</h5><p>{texto_meso}</p><span>Mesorregiões</span></div><div class="info-card"><h5>📍 Municípios</h5><p>{texto_mun}</p><span>Selecionados</span></div></div>{expander_html}</div>'
         return info_html
 
-    # --- INJETAR CSS E HTML ---
-    st.markdown(header_style, unsafe_allow_html=True)
-
-    nav_html = build_nav_html()
+    # Renderiza os cards de info
     info_html = build_info_html()
+    if info_html:
+        st.markdown(f'<div style="position: fixed; top: 70px; left: 0; width: 100vw; z-index: 999998;">{info_html}</div>', unsafe_allow_html=True)
 
-    header_html = f'<div class="fixed-header"><div class="header-nav-row">{nav_html}</div>{info_html}</div>'
 
-    st.markdown(header_html, unsafe_allow_html=True)
-
-    # --- JAVASCRIPT PARA NAVEGAÇÃO ---
-    # Script que muda a URL quando botões são clicados
-    js_navegacao = """
-    <script>
-        // Função global para navegar entre abas
-        function navegarAba(tabParam) {
-            // Pega a URL base (sem query params)
-            const baseUrl = window.location.origin + window.location.pathname;
-            // Cria nova URL com o parâmetro da aba
-            const novaUrl = baseUrl + '?tab=' + tabParam;
-            // Navega para a nova URL (isso vai recarregar a página com o novo query param)
-            window.location.href = novaUrl;
-        }
-
-        // Torna a função disponível globalmente no parent também
-        if (window.parent && window.parent !== window) {
-            window.parent.navegarAba = navegarAba;
-        }
-    </script>
+def render_tab_buttons():
+    """
+    Renderiza os botões de navegação das abas usando botões Streamlit nativos.
+    Estes botões serão posicionados no header fixo via CSS.
     """
 
-    # Injeta o JavaScript na página
-    components.html(js_navegacao, height=0)
+    # Callbacks para mudar de aba
+    def mudar_aba(nome_aba):
+        st.session_state.active_tab = nome_aba
+
+    # Container com ID específico para o CSS posicionar
+    st.markdown('<div id="header-tabs-container">', unsafe_allow_html=True)
+
+    # Cria os botões em colunas
+    col1, col2, col3, col4 = st.columns(4)
+
+    with col1:
+        tipo = "primary" if st.session_state.get('active_tab') == "Análise Geral" else "secondary"
+        st.button(
+            "📊 Análise Geral",
+            key="btn_analise_geral",
+            on_click=mudar_aba,
+            args=("Análise Geral",),
+            type=tipo,
+            use_container_width=True
+        )
+
+    with col2:
+        tipo = "primary" if st.session_state.get('active_tab') == "Análise de Feminicídios" else "secondary"
+        st.button(
+            "🚨 Análise de Feminicídios",
+            key="btn_feminicidios",
+            on_click=mudar_aba,
+            args=("Análise de Feminicídios",),
+            type=tipo,
+            use_container_width=True
+        )
+
+    with col3:
+        tipo = "primary" if st.session_state.get('active_tab') == "Metodologia e Glossário" else "secondary"
+        st.button(
+            "📖 Metodologia e Glossário",
+            key="btn_metodologia",
+            on_click=mudar_aba,
+            args=("Metodologia e Glossário",),
+            type=tipo,
+            use_container_width=True
+        )
+
+    with col4:
+        tipo = "primary" if st.session_state.get('active_tab') == "Download de Dados" else "secondary"
+        st.button(
+            "📥 Download de Dados",
+            key="btn_download",
+            on_click=mudar_aba,
+            args=("Download de Dados",),
+            type=tipo,
+            use_container_width=True
+        )
+
+    st.markdown('</div>', unsafe_allow_html=True)
