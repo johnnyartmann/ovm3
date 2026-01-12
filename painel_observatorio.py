@@ -268,33 +268,38 @@ if not st.session_state.df_geral.empty:
         (st.session_state.df_feminicidio['municipio_normalizado'].isin(municipios_filtrados_populacao))
     ].copy()
 
-    # --- BOTÕES DE NAVEGAÇÃO (STREAMLIT NATIVO COM CALLBACKS) ---
+    # Renderiza o header fixo via módulo externo
+    header.render_custom_header()
+
+    # --- BOTÕES DE NAVEGAÇÃO ESCONDIDOS (PARA INTEGRAÇÃO COM HEADER JS) ---
+    # Estes botões são clicados programaticamente pelo JavaScript do header
+    st.markdown('<div style="display: none;">', unsafe_allow_html=True)
+
     col1, col2, col3, col4 = st.columns(4, gap="small")
-    
+
     with col1:
         if st.button("📊 Análise Geral", use_container_width=True, key="btn_ag"):
             st.session_state.active_tab = "Análise Geral"
             st.rerun()
-    
+
     with col2:
         if st.button("🚨 Análise de Feminicídios", use_container_width=True, key="btn_af"):
             st.session_state.active_tab = "Análise de Feminicídios"
             st.rerun()
-    
+
     with col3:
         if st.button("📖 Metodologia e Glossário", use_container_width=True, key="btn_mg"):
             st.session_state.active_tab = "Metodologia e Glossário"
             st.rerun()
-    
+
     with col4:
         if st.button("📥 Download de Dados", use_container_width=True, key="btn_dd"):
             st.session_state.active_tab = "Download de Dados"
             st.rerun()
 
-    st.divider()
+    st.markdown('</div>', unsafe_allow_html=True)
 
-    # Renderiza o header fixo via módulo externo
-    header.render_custom_header()
+    st.divider()
 
     # --- RENDERIZAÇÃO DO CONTEÚDO (BASEADO NA ABA ATIVA) ---
     if st.session_state.active_tab == "Análise Geral":
