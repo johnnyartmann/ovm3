@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components
 
 def render_custom_header():
     """
@@ -450,5 +451,108 @@ def render_custom_header():
     info_html = build_info_html()
     
     header_html = f'<div class="fixed-header"><div class="header-nav-row">{nav_html}</div>{info_html}</div>'
-    
+
     st.markdown(header_html, unsafe_allow_html=True)
+
+    # --- JAVASCRIPT PARA CAPTURAR CLIQUES DOS BOTÕES ---
+    # Este componente adiciona event listeners aos botões do header
+    # e clica programaticamente nos botões Streamlit escondidos
+    js_code = """
+    <script>
+        // Mapeamento de abas para keys dos botões Streamlit
+        const tabToButtonKey = {
+            'Análise Geral': 'btn_ag',
+            'Análise de Feminicídios': 'btn_af',
+            'Metodologia e Glossário': 'btn_mg',
+            'Download de Dados': 'btn_dd'
+        };
+
+        // Função para clicar no botão Streamlit correspondente
+        function clickStreamlitButton(tabName) {
+            const buttonKey = tabToButtonKey[tabName];
+            if (!buttonKey) {
+                console.warn('Botão não encontrado para aba:', tabName);
+                return;
+            }
+
+            // Busca o botão Streamlit pelo atributo data-testid e aria-label
+            // Streamlit usa diferentes seletores, então tentamos vários
+            const selectors = [
+                `button[key="${buttonKey}"]`,
+                `button[data-testid="baseButton-secondary"][aria-label*="${tabName}"]`,
+                `button[data-testid="baseButton-secondary"]:has-text("${tabName}")`,
+                `button:has-text("${tabName}")`
+            ];
+
+            let streamlitButton = null;
+
+            // Tenta encontrar o botão usando vários seletores
+            for (const selector of selectors) {
+                try {
+                    const buttons = window.parent.document.querySelectorAll('button[data-testid="baseButton-secondary"]');
+                    for (const btn of buttons) {
+                        const btnText = btn.textContent || btn.innerText;
+                        if (btnText.includes(tabName.split(' ')[0]) || btnText.includes(tabName)) {
+                            streamlitButton = btn;
+                            break;
+                        }
+                    }
+                    if (streamlitButton) break;
+                } catch (e) {
+                    console.log('Erro ao buscar com selector:', selector, e);
+                }
+            }
+
+            if (streamlitButton) {
+                console.log('Clicando no botão Streamlit para:', tabName);
+                streamlitButton.click();
+            } else {
+                console.warn('Botão Streamlit não encontrado para:', tabName);
+            }
+        }
+
+        // Configura event listeners nos botões do header
+        function setupButtonListeners() {
+            const buttons = window.parent.document.querySelectorAll('.nav-link');
+
+            if (buttons.length === 0) {
+                // Se não encontrou, tenta novamente após um delay
+                setTimeout(setupButtonListeners, 100);
+                return;
+            }
+
+            console.log('Configurando listeners para', buttons.length, 'botões');
+
+            buttons.forEach(button => {
+                // Remove listeners anteriores para evitar duplicação
+                const newButton = button.cloneNode(true);
+                button.parentNode.replaceChild(newButton, button);
+
+                // Adiciona novo listener
+                newButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const tabName = this.getAttribute('data-tab');
+                    if (tabName) {
+                        console.log('Botão clicado:', tabName);
+                        clickStreamlitButton(tabName);
+                    }
+                });
+            });
+        }
+
+        // Inicia setup dos listeners
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', setupButtonListeners);
+        } else {
+            setupButtonListeners();
+        }
+
+        // Tenta novamente após delays para garantir que o DOM está pronto
+        setTimeout(setupButtonListeners, 300);
+        setTimeout(setupButtonListeners, 800);
+    </script>
+    """
+
+    # Renderiza o JavaScript (altura 0 para não ocupar espaço visual)
+    components.html(js_code, height=0)
