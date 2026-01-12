@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components
 
 def render_custom_header():
     """
@@ -376,7 +377,7 @@ def render_custom_header():
         return st.session_state.get('active_tab', 'Análise Geral')
 
     def build_nav_html():
-        """Constrói os botões de navegação usando links que atualizam query params"""
+        """Constrói os botões de navegação usando botões com onclick JavaScript"""
         active = get_active_tab()
 
         # Mapeamento de abas para query params
@@ -390,8 +391,8 @@ def render_custom_header():
         nav_html = '<div class="nav-links-container">'
         for item in nav_items:
             active_class = "active" if item["key"] == active else ""
-            # Criar link que atualiza o query parameter
-            nav_html += f'<a href="?tab={item["param"]}" class="nav-link {active_class}"><span>{item["icon"]}</span> {item["label"]}</a>'
+            # Criar botão com onclick que muda a URL
+            nav_html += f'<button class="nav-link {active_class}" onclick="navegarAba(\'{item["param"]}\')"><span>{item["icon"]}</span> {item["label"]}</button>'
         nav_html += '</div>'
         return nav_html
 
@@ -449,3 +450,27 @@ def render_custom_header():
     header_html = f'<div class="fixed-header"><div class="header-nav-row">{nav_html}</div>{info_html}</div>'
 
     st.markdown(header_html, unsafe_allow_html=True)
+
+    # --- JAVASCRIPT PARA NAVEGAÇÃO ---
+    # Script que muda a URL quando botões são clicados
+    js_navegacao = """
+    <script>
+        // Função global para navegar entre abas
+        function navegarAba(tabParam) {
+            // Pega a URL base (sem query params)
+            const baseUrl = window.location.origin + window.location.pathname;
+            // Cria nova URL com o parâmetro da aba
+            const novaUrl = baseUrl + '?tab=' + tabParam;
+            // Navega para a nova URL (isso vai recarregar a página com o novo query param)
+            window.location.href = novaUrl;
+        }
+
+        // Torna a função disponível globalmente no parent também
+        if (window.parent && window.parent !== window) {
+            window.parent.navegarAba = navegarAba;
+        }
+    </script>
+    """
+
+    # Injeta o JavaScript na página
+    components.html(js_navegacao, height=0)
