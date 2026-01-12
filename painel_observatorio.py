@@ -7,7 +7,6 @@ from tabs import analise_feminicidios
 from tabs import download
 from tabs import glossario
 import header  # Importa o módulo do cabeçalho
-import header_tabs  # Importa o módulo dos botões de navegação
 
 # --- FUNÇÃO PARA CARREGAR O CSS EXTERNO ---
 def carregar_css(caminho_arquivo):
@@ -52,6 +51,25 @@ else:
 # --- INICIALIZAÇÃO DE ESTADO ---
 if 'active_tab' not in st.session_state:
     st.session_state.active_tab = "Análise Geral"
+
+# --- LEITURA DE QUERY PARAMS PARA NAVEGAÇÃO ---
+# Mapeia query params para nomes de abas
+query_params = st.query_params
+tab_param = query_params.get("tab", None)
+
+tab_mapping = {
+    "analise-geral": "Análise Geral",
+    "feminicidios": "Análise de Feminicídios",
+    "metodologia": "Metodologia e Glossário",
+    "download": "Download de Dados"
+}
+
+# Atualiza a aba ativa se houver um parâmetro válido
+if tab_param and tab_param in tab_mapping:
+    nova_aba = tab_mapping[tab_param]
+    if st.session_state.active_tab != nova_aba:
+        st.session_state.active_tab = nova_aba
+        st.rerun()
 
 # --- SIDEBAR E FILTROS ---
 st.sidebar.image("logo_ovm.jpeg", use_container_width=True)
@@ -271,9 +289,6 @@ if not st.session_state.df_geral.empty:
 
     # Renderiza o header fixo via módulo externo
     header.render_custom_header()
-
-    # Renderiza os botões de navegação das abas (ocultos, mas funcionais para o JavaScript)
-    header_tabs.render_hidden_tab_buttons()
 
     # --- RENDERIZAÇÃO DO CONTEÚDO (BASEADO NA ABA ATIVA) ---
     if st.session_state.active_tab == "Análise Geral":

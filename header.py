@@ -1,12 +1,11 @@
 import streamlit as st
-import streamlit.components.v1 as components
 
 def render_custom_header():
     """
-    Renderiza o cabeçalho fixo customizado no topo da página (como linha congelada no Excel).
-    
+    Renderiza o cabeçalho fixo customizado no topo da página.
+
     Layout:
-    1. Botões de navegação (Abas simuladas)
+    1. Botões de navegação (Abas funcionais via query params)
     2. Cards de resumo (Filtros atuais)
     3. Expander para detalhes de municípios (quando necessário)
     """
@@ -34,7 +33,7 @@ def render_custom_header():
             color: white !important;
             fill: white !important;
         }
-        
+
         [data-testid="stSidebarCollapsedControl"] {
             display: block !important;
             pointer-events: auto !important;
@@ -42,7 +41,7 @@ def render_custom_header():
         }
 
         footer { visibility: hidden; }
-        
+
         /* HEADER FIXO PRINCIPAL */
         .fixed-header {
             position: fixed;
@@ -60,7 +59,7 @@ def render_custom_header():
             color: #333;
             overflow: hidden;
         }
-        
+
         /* LINHAS DO HEADER */
         .header-nav-row {
             display: flex;
@@ -83,7 +82,7 @@ def render_custom_header():
             background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
             min-height: 90px;
         }
-        
+
         /* BOTÕES DE NAVEGAÇÃO */
         .nav-links-container {
             display: flex;
@@ -114,7 +113,7 @@ def render_custom_header():
             height: 40px;
             min-width: fit-content;
         }
-        
+
         .nav-link:hover {
             color: #8e24aa !important;
             background: #f9f5ff;
@@ -122,7 +121,7 @@ def render_custom_header():
             box-shadow: 0 2px 6px rgba(142, 36, 170, 0.15);
             transform: translateY(-1px);
         }
-        
+
         .nav-link.active {
             background: linear-gradient(135deg, #8e24aa 0%, #ab47bc 100%) !important;
             color: white !important;
@@ -135,7 +134,7 @@ def render_custom_header():
             box-shadow: 0 6px 16px rgba(142, 36, 170, 0.4);
             transform: translateY(-2px);
         }
-        
+
         /* CARDS DE INFO */
         .info-container {
             display: flex;
@@ -160,7 +159,7 @@ def render_custom_header():
             background: rgba(142, 36, 170, 0.2);
             border-radius: 2px;
         }
-        
+
         .info-card {
             display: flex;
             flex-direction: column;
@@ -170,7 +169,7 @@ def render_custom_header():
             flex: 0 0 auto;
             min-width: 180px;
         }
-        
+
         .info-card h5 {
             margin: 0;
             color: #999;
@@ -182,7 +181,7 @@ def render_custom_header():
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        
+
         .info-card p {
             margin: 4px 0 0 0;
             color: #4a148c;
@@ -193,7 +192,7 @@ def render_custom_header():
             text-overflow: ellipsis;
             line-height: 1.2;
         }
-        
+
         .info-card span {
             font-size: 12px;
             color: #999;
@@ -202,7 +201,7 @@ def render_custom_header():
             text-overflow: ellipsis;
             margin-top: 2px;
         }
-        
+
         /* EXPANDER HTML NO HEADER */
         .header-expander {
             margin-top: 0.5rem;
@@ -258,18 +257,18 @@ def render_custom_header():
             color: #4a148c;
             font-weight: 700;
         }
-        
+
         /* AJUSTES DE LAYOUT PRINCIPAL */
         .block-container {
             padding-top: 180px !important;
             margin-top: 0 !important;
         }
-        
+
         section[data-testid="stSidebar"] {
             top: 0;
             z-index: 999998;
         }
-        
+
         /* RESPONSIVIDADE */
         @media (max-width: 1200px) {
             .header-nav-row {
@@ -307,13 +306,13 @@ def render_custom_header():
             .fixed-header {
                 width: 100%;
             }
-            
+
             .header-nav-row {
                 padding: 0.75rem 1rem;
                 gap: 0.5rem;
                 min-height: 60px;
             }
-            
+
             .nav-link {
                 padding: 0.4rem 0.8rem;
                 font-size: 11px;
@@ -323,7 +322,7 @@ def render_custom_header():
             .nav-link span {
                 display: none;
             }
-            
+
             .info-container {
                 gap: 1rem;
             }
@@ -375,43 +374,40 @@ def render_custom_header():
     def get_active_tab():
         """Retorna a aba ativa ou padrão"""
         return st.session_state.get('active_tab', 'Análise Geral')
-    
-    def set_active_tab(tab_name):
-        """Callback para mudar de aba"""
-        st.session_state.active_tab = tab_name
-    
+
     def build_nav_html():
-        """Constrói os botões de navegação"""
+        """Constrói os botões de navegação usando links que atualizam query params"""
         active = get_active_tab()
+
+        # Mapeamento de abas para query params
         nav_items = [
-            {"key": "Análise Geral", "label": "Análise Geral", "icon": "📊"},
-            {"key": "Análise de Feminicídios", "label": "Análise de Feminicídios", "icon": "🚨"},
-            {"key": "Metodologia e Glossário", "label": "Metodologia e Glossário", "icon": "📖"},
-            {"key": "Download de Dados", "label": "Download de Dados", "icon": "📥"},
+            {"key": "Análise Geral", "label": "Análise Geral", "icon": "📊", "param": "analise-geral"},
+            {"key": "Análise de Feminicídios", "label": "Análise de Feminicídios", "icon": "🚨", "param": "feminicidios"},
+            {"key": "Metodologia e Glossário", "label": "Metodologia e Glossário", "icon": "📖", "param": "metodologia"},
+            {"key": "Download de Dados", "label": "Download de Dados", "icon": "📥", "param": "download"},
         ]
-        
+
         nav_html = '<div class="nav-links-container">'
         for item in nav_items:
             active_class = "active" if item["key"] == active else ""
-            # Usar um ID único para cada botão que será clicado pelo JS
-            button_id = item["key"].replace(" ", "-").lower().replace("ã", "a").replace("ç", "c")
-            nav_html += f'<button class="nav-link {active_class}" data-tab="{item["key"]}" id="nav-btn-{button_id}"><span>{item["icon"]}</span> {item["label"]}</button>'
+            # Criar link que atualiza o query parameter
+            nav_html += f'<a href="?tab={item["param"]}" class="nav-link {active_class}"><span>{item["icon"]}</span> {item["label"]}</a>'
         nav_html += '</div>'
         return nav_html
-    
+
     def build_info_html():
         """Constrói os cards de informação dos filtros"""
         if 'data_inicial' not in st.session_state or 'df_geral_filtrado' not in st.session_state:
             return ""
-        
+
         data_ini = st.session_state.data_inicial
         data_fim = st.session_state.data_final
         dias_totais = (data_fim - data_ini).days
-        
+
         mesos_no_filtro = st.session_state.df_geral_filtrado['mesoregiao'].unique()
         mesos_reais = [m for m in mesos_no_filtro if m != 'Não informado']
         qtd_mesos = len(mesos_reais)
-        
+
         if qtd_mesos >= 6:
             texto_meso = "Todo o Estado (SC)"
             detalhe_meso = None
@@ -421,10 +417,10 @@ def render_custom_header():
         else:
             texto_meso = f"{qtd_mesos} Mesorregiões"
             detalhe_meso = None
-        
+
         muns_selecionados = st.session_state.df_geral_filtrado['municipio'].unique()
         qtd_mun = len(muns_selecionados)
-        
+
         if qtd_mun >= 293:
             texto_mun = "Todos os 295 Municípios"
             mostrar_expander_mun = False
@@ -434,125 +430,22 @@ def render_custom_header():
         else:
             texto_mun = f"{qtd_mun} Municípios"
             mostrar_expander_mun = qtd_mun > 3
-        
+
         # Monta HTML do expander se necessário
         expander_html = ""
         if mostrar_expander_mun or detalhe_meso:
             lista_mun = ", ".join(sorted(muns_selecionados)) if mostrar_expander_mun else ""
             expander_html = f'<details class="header-expander"><summary>🔎 Ver localidades selecionadas</summary><div class="expander-content">{"<p><strong>Mesorregiões:</strong> " + detalhe_meso + "</p>" if detalhe_meso else ""}{"<p><strong>Municípios:</strong> " + lista_mun + "</p>" if mostrar_expander_mun else ""}</div></details>'
-        
+
         info_html = f'<div class="header-info-row"><div class="info-container"><div class="info-card"><h5>📅 Período</h5><p>{data_ini.strftime("%d/%m/%Y")} - {data_fim.strftime("%d/%m/%Y")}</p><span>{dias_totais} dias</span></div><div class="info-card"><h5>🗺️ Abrangência</h5><p>{texto_meso}</p><span>Mesorregiões</span></div><div class="info-card"><h5>📍 Municípios</h5><p>{texto_mun}</p><span>Selecionados</span></div></div>{expander_html}</div>'
         return info_html
-    
+
     # --- INJETAR CSS E HTML ---
     st.markdown(header_style, unsafe_allow_html=True)
-    
+
     nav_html = build_nav_html()
     info_html = build_info_html()
-    
+
     header_html = f'<div class="fixed-header"><div class="header-nav-row">{nav_html}</div>{info_html}</div>'
 
     st.markdown(header_html, unsafe_allow_html=True)
-
-    # --- JAVASCRIPT PARA CAPTURAR CLIQUES DOS BOTÕES ---
-    # Este componente adiciona event listeners aos botões do header
-    # e clica programaticamente nos botões Streamlit escondidos
-    js_code = """
-    <script>
-        // Mapeamento de abas para keys dos botões Streamlit
-        const tabToButtonKey = {
-            'Análise Geral': 'btn_ag',
-            'Análise de Feminicídios': 'btn_af',
-            'Metodologia e Glossário': 'btn_mg',
-            'Download de Dados': 'btn_dd'
-        };
-
-        // Função para clicar no botão Streamlit correspondente
-        function clickStreamlitButton(tabName) {
-            const buttonKey = tabToButtonKey[tabName];
-            if (!buttonKey) {
-                console.warn('Botão não encontrado para aba:', tabName);
-                return;
-            }
-
-            // Busca o botão Streamlit pelo atributo data-testid e aria-label
-            // Streamlit usa diferentes seletores, então tentamos vários
-            const selectors = [
-                `button[key="${buttonKey}"]`,
-                `button[data-testid="baseButton-secondary"][aria-label*="${tabName}"]`,
-                `button[data-testid="baseButton-secondary"]:has-text("${tabName}")`,
-                `button:has-text("${tabName}")`
-            ];
-
-            let streamlitButton = null;
-
-            // Tenta encontrar o botão usando vários seletores
-            for (const selector of selectors) {
-                try {
-                    const buttons = window.parent.document.querySelectorAll('button[data-testid="baseButton-secondary"]');
-                    for (const btn of buttons) {
-                        const btnText = btn.textContent || btn.innerText;
-                        if (btnText.includes(tabName.split(' ')[0]) || btnText.includes(tabName)) {
-                            streamlitButton = btn;
-                            break;
-                        }
-                    }
-                    if (streamlitButton) break;
-                } catch (e) {
-                    console.log('Erro ao buscar com selector:', selector, e);
-                }
-            }
-
-            if (streamlitButton) {
-                console.log('Clicando no botão Streamlit para:', tabName);
-                streamlitButton.click();
-            } else {
-                console.warn('Botão Streamlit não encontrado para:', tabName);
-            }
-        }
-
-        // Configura event listeners nos botões do header
-        function setupButtonListeners() {
-            const buttons = window.parent.document.querySelectorAll('.nav-link');
-
-            if (buttons.length === 0) {
-                // Se não encontrou, tenta novamente após um delay
-                setTimeout(setupButtonListeners, 100);
-                return;
-            }
-
-            console.log('Configurando listeners para', buttons.length, 'botões');
-
-            buttons.forEach(button => {
-                // Remove listeners anteriores para evitar duplicação
-                const newButton = button.cloneNode(true);
-                button.parentNode.replaceChild(newButton, button);
-
-                // Adiciona novo listener
-                newButton.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    const tabName = this.getAttribute('data-tab');
-                    if (tabName) {
-                        console.log('Botão clicado:', tabName);
-                        clickStreamlitButton(tabName);
-                    }
-                });
-            });
-        }
-
-        // Inicia setup dos listeners
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', setupButtonListeners);
-        } else {
-            setupButtonListeners();
-        }
-
-        // Tenta novamente após delays para garantir que o DOM está pronto
-        setTimeout(setupButtonListeners, 300);
-        setTimeout(setupButtonListeners, 800);
-    </script>
-    """
-
-    # Renderiza o JavaScript (altura 0 para não ocupar espaço visual)
-    components.html(js_code, height=0)
