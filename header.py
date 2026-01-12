@@ -2,18 +2,17 @@ import streamlit as st
 
 def render_custom_header():
     """
-    Renderiza o cabeçalho fixo customizado no topo da página.
+    Renderiza o cabeçalho fixo customizado com informações dos filtros.
 
     Layout:
-    1. Botões de navegação (usando botões Streamlit nativos)
-    2. Cards de resumo (Filtros atuais)
-    3. Expander para detalhes de municípios (quando necessário)
+    - Cards de resumo dos filtros ativos (Período, Abrangência, Municípios)
+    - Expander para detalhes quando necessário
     """
 
-    # --- CSS PARA HEADER FIXO ---
+    # --- CSS PROFISSIONAL PARA HEADER ---
     header_style = """
     <style>
-        /* RESET & Compatibilidade */
+        /* RESET & Compatibilidade Streamlit */
         header[data-testid="stHeader"] {
             visibility: visible !important;
             background: transparent !important;
@@ -42,182 +41,178 @@ def render_custom_header():
 
         footer { visibility: hidden; }
 
-        /* HEADER FIXO PRINCIPAL */
-        .fixed-header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            background: white;
-            z-index: 999999;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            border-bottom: 1px solid rgba(0,0,0,0.1);
-            display: flex;
-            flex-direction: column;
-            padding: 0;
-            font-family: "Inter", "Source Sans Pro", sans-serif;
-            color: #333;
-            overflow: hidden;
-        }
-
-        /* LINHAS DO HEADER */
-        .header-nav-row {
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            padding: 1rem 2rem;
-            gap: 0.75rem;
-            border-bottom: 1px solid rgba(0,0,0,0.06);
-            flex-wrap: nowrap;
-            background: white;
-            min-height: 70px;
-        }
-
-        .header-info-row {
-            display: flex;
-            align-items: center;
-            padding: 1rem 2rem;
-            gap: 1.5rem;
-            flex-wrap: wrap;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
-            min-height: 90px;
-        }
-
-        /* CONTAINER DOS BOTÕES STREAMLIT */
+        /* CONTAINER DOS BOTÕES STREAMLIT NO TOPO */
         #header-tabs-container {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
-            background: white;
+            background: linear-gradient(to right, #ffffff 0%, #fafafa 100%);
             z-index: 999999;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            border-bottom: 1px solid rgba(0,0,0,0.06);
-            padding: 1rem 2rem;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            border-bottom: 1px solid #e8e8e8;
+            padding: 0.875rem 2rem;
             display: flex !important;
             gap: 0.75rem;
             align-items: center;
-            min-height: 70px;
+            min-height: 68px;
         }
 
-        /* Estiliza os botões Streamlit dentro do container */
-        #header-tabs-container button[data-testid="baseButton-secondary"] {
-            color: #666 !important;
-            font-weight: 500;
-            padding: 0.6rem 1.2rem !important;
-            border-radius: 8px !important;
-            transition: all 0.25s ease;
-            font-size: 13px !important;
+        /* Estilização dos botões Streamlit */
+        #header-tabs-container button[data-testid="baseButton-secondary"],
+        #header-tabs-container button[data-testid="baseButton-primary"] {
+            font-weight: 500 !important;
+            padding: 0.625rem 1.25rem !important;
+            border-radius: 10px !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            font-size: 13.5px !important;
             white-space: nowrap;
-            border: 1px solid #e0e0e0 !important;
+            border: 1.5px solid #e5e5e5 !important;
             background: white !important;
+            color: #555 !important;
             cursor: pointer;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
-            height: 40px !important;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06) !important;
+            height: 42px !important;
             min-width: fit-content;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
         }
 
         #header-tabs-container button[data-testid="baseButton-secondary"]:hover {
             color: #8e24aa !important;
-            background: #f9f5ff !important;
-            border-color: #dfc8e8 !important;
-            box-shadow: 0 2px 6px rgba(142, 36, 170, 0.15) !important;
-            transform: translateY(-1px);
+            background: linear-gradient(135deg, #faf5ff 0%, #f3e5f5 100%) !important;
+            border-color: #ce93d8 !important;
+            box-shadow: 0 3px 10px rgba(142, 36, 170, 0.2) !important;
+            transform: translateY(-2px);
         }
 
-        /* Botão ativo (marcado quando está selecionado) */
-        #header-tabs-container button[data-testid="baseButton-secondary"][kind="primary"],
-        #header-tabs-container button[data-testid="baseButton-secondary"].active {
+        /* Botão ativo (primary) */
+        #header-tabs-container button[data-testid="baseButton-primary"] {
             background: linear-gradient(135deg, #8e24aa 0%, #ab47bc 100%) !important;
             color: white !important;
-            font-weight: 700 !important;
-            box-shadow: 0 4px 12px rgba(142, 36, 170, 0.35) !important;
+            font-weight: 600 !important;
+            box-shadow: 0 4px 14px rgba(142, 36, 170, 0.4) !important;
             border-color: #8e24aa !important;
         }
 
-        /* CARDS DE INFO */
-        .info-container {
+        #header-tabs-container button[data-testid="baseButton-primary"]:hover {
+            background: linear-gradient(135deg, #7b1fa2 0%, #9c27b0 100%) !important;
+            box-shadow: 0 6px 20px rgba(142, 36, 170, 0.5) !important;
+            transform: translateY(-2px);
+        }
+
+        /* HEADER DE INFORMAÇÕES (abaixo dos botões) */
+        .info-header-container {
+            position: fixed;
+            top: 68px;
+            left: 0;
+            width: 100vw;
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 50%, #f5f7fa 100%);
+            z-index: 999998;
+            padding: 1.25rem 2rem 1.5rem 2rem;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+            border-bottom: 1px solid rgba(142, 36, 170, 0.12);
+        }
+
+        /* Container dos cards */
+        .info-cards-wrapper {
             display: flex;
-            gap: 2rem;
-            width: 100%;
-            justify-content: flex-start;
-            align-items: center;
-            flex-wrap: nowrap;
-            overflow-x: auto;
-            padding-right: 1rem;
+            gap: 1.75rem;
+            align-items: stretch;
+            flex-wrap: wrap;
+            max-width: 1400px;
+            margin: 0 auto;
         }
 
-        .info-container::-webkit-scrollbar {
-            height: 4px;
-        }
-
-        .info-container::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .info-container::-webkit-scrollbar-thumb {
-            background: rgba(142, 36, 170, 0.2);
-            border-radius: 2px;
-        }
-
+        /* Card individual */
         .info-card {
             display: flex;
             flex-direction: column;
             justify-content: center;
+            background: white;
+            padding: 1.125rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(142, 36, 170, 0.08);
             border-left: 4px solid #8e24aa;
-            padding-left: 1rem;
-            flex: 0 0 auto;
-            min-width: 180px;
+            flex: 1 1 220px;
+            min-width: 200px;
+            max-width: 320px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
         }
 
-        .info-card h5 {
-            margin: 0;
-            color: #999;
-            font-size: 10px;
+        .info-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(142, 36, 170, 0.02) 0%, transparent 100%);
+            pointer-events: none;
+        }
+
+        .info-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(142, 36, 170, 0.15), 0 3px 8px rgba(0, 0, 0, 0.08);
+            border-left-width: 5px;
+        }
+
+        /* Título do card */
+        .info-card-title {
+            margin: 0 0 0.5rem 0;
+            color: #7a7a7a;
+            font-size: 10.5px;
             text-transform: uppercase;
             font-weight: 700;
-            letter-spacing: 0.5px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
-        .info-card p {
-            margin: 4px 0 0 0;
+        /* Valor principal do card */
+        .info-card-value {
+            margin: 0;
             color: #4a148c;
             font-weight: 700;
-            font-size: 15px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            line-height: 1.2;
+            font-size: 17px;
+            line-height: 1.3;
+            margin-bottom: 0.25rem;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
-        .info-card span {
+        /* Subtexto do card */
+        .info-card-subtitle {
             font-size: 12px;
-            color: #999;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            margin-top: 2px;
+            color: #9e9e9e;
+            margin: 0;
+            font-weight: 500;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
-        /* EXPANDER HTML NO HEADER */
+        /* EXPANDER ELEGANTE */
         .header-expander {
-            margin-top: 0.5rem;
-            padding: 0.75rem 1rem;
+            margin-top: 1rem;
+            padding: 0.875rem 1.25rem;
             background: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
+            border: 1px solid rgba(142, 36, 170, 0.15);
+            border-radius: 10px;
             cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .header-expander:hover {
-            background: #f9f5ff;
-            border-color: #dfc8e8;
-            box-shadow: 0 2px 6px rgba(142, 36, 170, 0.15);
+            background: linear-gradient(135deg, #faf5ff 0%, #f3e5f5 100%);
+            border-color: #ce93d8;
+            box-shadow: 0 4px 12px rgba(142, 36, 170, 0.12);
+            transform: translateY(-1px);
         }
 
         .header-expander summary {
@@ -229,129 +224,137 @@ def render_custom_header():
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
         .header-expander summary::-webkit-details-marker {
             color: #8e24aa;
         }
 
+        .header-expander[open] {
+            box-shadow: 0 6px 16px rgba(142, 36, 170, 0.15);
+        }
+
         .header-expander[open] summary {
-            color: #6a1b9a;
-            margin-bottom: 0.5rem;
+            color: #7b1fa2;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(142, 36, 170, 0.15);
         }
 
         .expander-content {
-            font-size: 12px;
-            color: #666;
-            line-height: 1.5;
-            border-top: 1px solid #e0e0e0;
-            padding-top: 0.5rem;
+            font-size: 12.5px;
+            color: #555;
+            line-height: 1.6;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
         .expander-content p {
-            margin: 0.3rem 0;
+            margin: 0.5rem 0;
             word-break: break-word;
         }
 
         .expander-content strong {
-            color: #4a148c;
+            color: #6a1b9a;
             font-weight: 700;
         }
 
         /* AJUSTES DE LAYOUT PRINCIPAL */
         .block-container {
-            padding-top: 180px !important;
+            padding-top: 195px !important;
             margin-top: 0 !important;
         }
 
         section[data-testid="stSidebar"] {
             top: 0;
-            z-index: 999998;
+            z-index: 999997;
         }
 
-        /* RESPONSIVIDADE */
+        /* RESPONSIVIDADE PROFISSIONAL */
         @media (max-width: 1200px) {
             #header-tabs-container {
                 padding: 0.75rem 1.5rem;
-                gap: 0.5rem;
-                min-height: 65px;
+                gap: 0.6rem;
+                min-height: 64px;
             }
 
-            #header-tabs-container button[data-testid="baseButton-secondary"] {
+            #header-tabs-container button {
                 padding: 0.5rem 1rem !important;
-                font-size: 12px !important;
-                height: 36px !important;
+                font-size: 12.5px !important;
+                height: 38px !important;
             }
 
-            .header-info-row {
-                padding: 0.75rem 1.5rem;
-                gap: 1rem;
-                min-height: 85px;
+            .info-header-container {
+                top: 64px;
+                padding: 1rem 1.5rem 1.25rem 1.5rem;
+            }
+
+            .info-cards-wrapper {
+                gap: 1.25rem;
             }
 
             .info-card {
-                min-width: 150px;
-            }
-
-            .info-container {
-                gap: 1.5rem;
+                flex: 1 1 180px;
+                min-width: 180px;
+                padding: 1rem 1.25rem;
             }
 
             .block-container {
-                padding-top: 160px !important;
+                padding-top: 180px !important;
             }
         }
 
         @media (max-width: 900px) {
             #header-tabs-container {
-                padding: 0.75rem 1rem;
-                gap: 0.3rem;
+                padding: 0.625rem 1rem;
+                gap: 0.4rem;
                 min-height: 60px;
             }
 
-            #header-tabs-container button[data-testid="baseButton-secondary"] {
+            #header-tabs-container button {
                 padding: 0.4rem 0.8rem !important;
-                font-size: 11px !important;
-                height: 34px !important;
+                font-size: 11.5px !important;
+                height: 36px !important;
             }
 
-            .info-container {
+            .info-header-container {
+                top: 60px;
+                padding: 0.875rem 1rem 1rem 1rem;
+            }
+
+            .info-cards-wrapper {
                 gap: 1rem;
             }
 
-            .header-info-row {
-                padding: 0.75rem 1rem;
-                gap: 0.75rem;
-                min-height: auto;
-                display: flex;
-                flex-wrap: wrap;
+            .info-card {
+                flex: 1 1 160px;
+                min-width: 160px;
+                padding: 0.875rem 1rem;
             }
 
-            .info-card {
-                min-width: 140px;
-                border-left-width: 3px;
-                padding-left: 0.75rem;
+            .info-card-value {
+                font-size: 15px;
             }
 
             .block-container {
-                padding-top: 150px !important;
+                padding-top: 165px !important;
             }
         }
 
         @media (max-width: 600px) {
             #header-tabs-container {
                 padding: 0.5rem;
-                gap: 0.2rem;
-                min-height: 55px;
+                gap: 0.25rem;
+                min-height: 56px;
             }
 
-            #header-tabs-container button[data-testid="baseButton-secondary"] {
-                padding: 0.3rem 0.5rem !important;
+            #header-tabs-container button {
+                padding: 0.35rem 0.6rem !important;
                 font-size: 10px !important;
                 height: 32px !important;
             }
 
-            .header-info-row {
+            .info-header-container {
                 display: none;
             }
 
@@ -365,9 +368,9 @@ def render_custom_header():
     # --- INJETAR CSS ---
     st.markdown(header_style, unsafe_allow_html=True)
 
-    # --- CONSTRUIR INFO CARDS HTML ---
+    # --- CONSTRUIR HTML DAS INFORMAÇÕES ---
     def build_info_html():
-        """Constrói os cards de informação dos filtros"""
+        """Constrói os cards de informação dos filtros com design profissional"""
         if 'data_inicial' not in st.session_state or 'df_geral_filtrado' not in st.session_state:
             return ""
 
@@ -375,6 +378,7 @@ def render_custom_header():
         data_fim = st.session_state.data_final
         dias_totais = (data_fim - data_ini).days
 
+        # Análise das mesorregiões
         mesos_no_filtro = st.session_state.df_geral_filtrado['mesoregiao'].unique()
         mesos_reais = [m for m in mesos_no_filtro if m != 'Não informado']
         qtd_mesos = len(mesos_reais)
@@ -389,6 +393,7 @@ def render_custom_header():
             texto_meso = f"{qtd_mesos} Mesorregiões"
             detalhe_meso = None
 
+        # Análise dos municípios
         muns_selecionados = st.session_state.df_geral_filtrado['municipio'].unique()
         qtd_mun = len(muns_selecionados)
 
@@ -402,19 +407,61 @@ def render_custom_header():
             texto_mun = f"{qtd_mun} Municípios"
             mostrar_expander_mun = qtd_mun > 3
 
-        # Monta HTML do expander se necessário
+        # Construir cards
+        cards_html = f"""
+        <div class="info-cards-wrapper">
+            <div class="info-card">
+                <div class="info-card-title">📅 PERÍODO</div>
+                <div class="info-card-value">{data_ini.strftime("%d/%m/%Y")} - {data_fim.strftime("%d/%m/%Y")}</div>
+                <div class="info-card-subtitle">{dias_totais:,} dias selecionados</div>
+            </div>
+
+            <div class="info-card">
+                <div class="info-card-title">🗺️ ABRANGÊNCIA</div>
+                <div class="info-card-value">{texto_meso}</div>
+                <div class="info-card-subtitle">Mesorregiões</div>
+            </div>
+
+            <div class="info-card">
+                <div class="info-card-title">📍 MUNICÍPIOS</div>
+                <div class="info-card-value">{texto_mun}</div>
+                <div class="info-card-subtitle">Selecionados para análise</div>
+            </div>
+        </div>
+        """
+
+        # Adicionar expander se necessário
         expander_html = ""
         if mostrar_expander_mun or detalhe_meso:
             lista_mun = ", ".join(sorted(muns_selecionados)) if mostrar_expander_mun else ""
-            expander_html = f'<details class="header-expander"><summary>🔎 Ver localidades selecionadas</summary><div class="expander-content">{"<p><strong>Mesorregiões:</strong> " + detalhe_meso + "</p>" if detalhe_meso else ""}{"<p><strong>Municípios:</strong> " + lista_mun + "</p>" if mostrar_expander_mun else ""}</div></details>'
 
-        info_html = f'<div class="header-info-row"><div class="info-container"><div class="info-card"><h5>📅 Período</h5><p>{data_ini.strftime("%d/%m/%Y")} - {data_fim.strftime("%d/%m/%Y")}</p><span>{dias_totais} dias</span></div><div class="info-card"><h5>🗺️ Abrangência</h5><p>{texto_meso}</p><span>Mesorregiões</span></div><div class="info-card"><h5>📍 Municípios</h5><p>{texto_mun}</p><span>Selecionados</span></div></div>{expander_html}</div>'
-        return info_html
+            detalhes_content = ""
+            if detalhe_meso:
+                detalhes_content += f"<p><strong>Mesorregiões:</strong> {detalhe_meso}</p>"
+            if mostrar_expander_mun:
+                detalhes_content += f"<p><strong>Municípios:</strong> {lista_mun}</p>"
 
-    # Renderiza os cards de info
+            expander_html = f"""
+            <details class="header-expander">
+                <summary>🔎 Ver detalhes das localidades selecionadas</summary>
+                <div class="expander-content">{detalhes_content}</div>
+            </details>
+            """
+
+        # HTML completo
+        full_html = f"""
+        <div class="info-header-container">
+            {cards_html}
+            {expander_html}
+        </div>
+        """
+
+        return full_html
+
+    # Renderizar informações
     info_html = build_info_html()
     if info_html:
-        st.markdown(f'<div style="position: fixed; top: 70px; left: 0; width: 100vw; z-index: 999998;">{info_html}</div>', unsafe_allow_html=True)
+        st.markdown(info_html, unsafe_allow_html=True)
 
 
 def render_tab_buttons():
@@ -423,7 +470,7 @@ def render_tab_buttons():
     Estes botões serão posicionados no header fixo via CSS.
     """
 
-    # Callbacks para mudar de aba
+    # Callback para mudar de aba
     def mudar_aba(nome_aba):
         st.session_state.active_tab = nome_aba
 
