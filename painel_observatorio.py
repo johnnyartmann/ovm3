@@ -7,6 +7,7 @@ from tabs import analise_feminicidios
 from tabs import download
 from tabs import glossario
 import header  # Importa o módulo do cabeçalho
+import header_tabs  # Importa o módulo dos botões de navegação
 
 # --- FUNÇÃO PARA CARREGAR O CSS EXTERNO ---
 def carregar_css(caminho_arquivo):
@@ -271,62 +272,8 @@ if not st.session_state.df_geral.empty:
     # Renderiza o header fixo via módulo externo
     header.render_custom_header()
 
-    # --- BOTÕES ESCONDIDOS PARA INTEGRAÇÃO COM JAVASCRIPT ---
-    # CSS para esconder completamente os próximos 4 botões Streamlit
-    # Eles ficam invisíveis mas funcionais para o JavaScript
-    st.markdown("""
-    <style>
-        /* Esconde TODOS os botões secundários Streamlit da área principal */
-        /* (o header usa botões HTML customizados, não afetados por isto) */
-        section.main button[data-testid="baseButton-secondary"] {
-            position: absolute !important;
-            left: -9999px !important;
-            top: -9999px !important;
-            width: 1px !important;
-            height: 1px !important;
-            overflow: hidden !important;
-            opacity: 0 !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            pointer-events: auto !important; /* Mantém clicável para JS */
-        }
-
-        /* Esconde também os containers dos botões */
-        section.main .stButton {
-            position: absolute !important;
-            left: -9999px !important;
-            width: 1px !important;
-            height: 1px !important;
-            overflow: hidden !important;
-            margin: 0 !important;
-            padding: 0 !important;
-        }
-
-        /* Esconde linhas de colunas que contêm os botões */
-        section.main .stHorizontalBlock {
-            display: none !important;
-        }
-    </style>
-    """, unsafe_allow_html=True)
-
-    # Botões mantidos apenas para funcionalidade (completamente invisíveis)
-    col1, col2, col3, col4 = st.columns(4)
-    with col1:
-        if st.button("📊 Análise Geral", key="btn_ag"):
-            st.session_state.active_tab = "Análise Geral"
-            st.rerun()
-    with col2:
-        if st.button("🚨 Análise de Feminicídios", key="btn_af"):
-            st.session_state.active_tab = "Análise de Feminicídios"
-            st.rerun()
-    with col3:
-        if st.button("📖 Metodologia e Glossário", key="btn_mg"):
-            st.session_state.active_tab = "Metodologia e Glossário"
-            st.rerun()
-    with col4:
-        if st.button("📥 Download de Dados", key="btn_dd"):
-            st.session_state.active_tab = "Download de Dados"
-            st.rerun()
+    # Renderiza os botões de navegação das abas (ocultos, mas funcionais para o JavaScript)
+    header_tabs.render_hidden_tab_buttons()
 
     # --- RENDERIZAÇÃO DO CONTEÚDO (BASEADO NA ABA ATIVA) ---
     if st.session_state.active_tab == "Análise Geral":
